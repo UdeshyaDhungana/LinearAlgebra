@@ -59,7 +59,7 @@ Count the total number of multiplications. In both ways, it turns out to be $mnp
 Here's a short proof on why both ways yield the same answer:
 
 The $i,j$ entry of $a_kb_k$ is $a_{ik}b_{kj}$. Add all those entries to form
-$$c_{ij} = \sum_{k=1}^{n} a_{ik}b_{kj}$$
+$$c_{ij} = \sum_{k=1}^{n} a_{ik}b_{kj}$$. Try it yourself if you're in doubt!
 "
 
 # ╔═╡ 964de7b5-3ea2-4ea0-8622-0c43ad5a3617
