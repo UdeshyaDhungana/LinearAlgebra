@@ -4,267 +4,99 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ cdb20e14-3483-443a-b279-da513c5523cb
+# ╔═╡ 4d0a276d-e52e-42bb-81b3-228e5eb40695
 begin
-	using Plots
-	orig = [0, 0, 0, 0]
-	t = pi/6
-	c, s = cos(t), sin(t)
-	objects = [1 0;0 1]
-	h = [c s;s -c]
-	images = h * objects
-	xs = [objects[1,:]' images[1,:]']
-	ys = [objects[2,:]' images[2,:]']
-	
-	# separator line
-	x = Array(range(-0.5,1,step=0.05))
-	y = x * tan(t/2)
-	scatter(x,y)
-	quiver!(orig, orig, quiver=(xs, ys), aspect_ratio=1, legend=false)
+	using Plots 
+	origin = [0, 0, 0]
+	t1, t2 = rand() * pi/6, pi/3 + rand() * pi/6
+	objects = [cos(t1) cos(t2); sin(t1) sin(t2)]
+	us = objects[:,1]
+	vs = objects[:, 2]
+	uts = transpose(us)
+	ws = vs - us * (uts * vs)
+	objects = [objects ws]
+	xs = objects[1,:]
+	ys = objects[2,:]
+	quiver(origin, origin, quiver=(xs, ys), aspect_ratio=1)
+	# I still haven't figured out how to label these quivers :( pls help
 end
 
-# ╔═╡ 6b8adf4c-f0f8-11eb-384c-bfb58bdd7eac
+# ╔═╡ 2b881548-f15b-11eb-3557-03f23356fea2
 md"
-# Lecture 3
-
-## $Q^TQ = I$
-
-+ Two vectors are perpendicular if their dot product is 0, i.e. $x^Tx = 0$.
-
-
-+ A matrix whose columns are all perpendicular to each other is called orthogonal matrix.
-
-
-+ An orthogonal matrix whose columns are of unit length is called orthonormal matrix.
-
-
-+ Orthogonal matrix can be converted to orthonormal columns by normalizing the columns.
-
-
-+ Orthogonal matrix are normally denoted as $Q$.
-
-
-+ Orthonormal Columns can be written as $Q^TQ = I$ because, dot product of each column with itself would give $1$, which are the diagonal entries in $I$, and all the other dot products are $0$, the non-diagonal entries.
-
-
-+ Remember, that it also means $Q^TQ = I \implies Q^T = Q^{-1}$ if $Q$ is square.
-
-
-+ Also, $QQ^T = I$ if $Q$ is square.
-
+# Solutions for Lecture 3
 "
 
-# ╔═╡ 6f5601b2-da4e-4fb8-b820-e912cd39be35
+# ╔═╡ 7c481e3e-187c-46de-bcbe-f53b05a72130
 md"
-## Some famous orthogonal/orthonormal matrices
+## 2
+
+Here, vectors $\textbf{u}$(lower) and $\textbf{v}$(upper) are two unit vectors that are not orthogonal.
+
+$$\textbf{w} = \textbf{v} - \textbf{u}(\textbf{u}^T\textbf{v})$$
+
+We shall show that $\textbf{w}$ and $\textbf{u}$ are orthogonal. We take the dot product of $\textbf{u}$ and $\textbf{w}$.
+
+Dot product
+$$= \textbf{u}^T (\textbf{v} - \textbf{u}(\textbf{u}^T\textbf{v}))$$
+$$= \textbf{u}^T\textbf{v} - \textbf{u}^T\textbf{u}(\textbf{u}^T\textbf{v})$$
+$$= \textbf{u}^T\textbf{v} - \textbf{u}^T\textbf{v}$$
+$$= 0$$
+
+Geometrically, $\textbf{w}$ the component of $\textbf{v}$ that is perpendicular to $u$. Look closely in the expression of $\textbf{u}$, you can see the projection part. So, it is bound to be perpendicular to $\textbf{u}$.
 "
 
-# ╔═╡ 4ae1fd26-3840-4478-91d1-fc791c360b21
-md"
-### 1. Rotation Matrix
-
-$Q = \begin{bmatrix}
-cos\theta{} & -sin\theta{}\\
-sin\theta{} & cos\theta{}
-\end{bmatrix}$
-$Q^T = Q^{-1}$.
-
-###### Rotation matrix keeps length constant
-__Proof:__
-
-$$||{Qx}||^2
-= (Qx)^T(Qx)
-= x^TQ^TQx
-= x^Tx$$
-
-Computations with $Q$ never overflow!
-
----
-"
-
-# ╔═╡ 6a387f58-76e2-428c-a6e7-ba5b6446a32d
-md"
-### 2. Householder's Reflection Matrix
-
-$Q = \begin{bmatrix}
-cos\theta{} & sin\theta{}\\
-sin\theta{} & -cos\theta{}
-\end{bmatrix}$
-
-+ It is symmetric
-+ It is a reflection matrix
-+ Its determinant is $1$.
-
-#### General Case:
-
-1. Start with a unit vector $u^Tu = 1$.
-2. The matrices $H = I - 2uu^T$ is family of Householder's Transformation Matrices
-
-
-__Claim:__ $H$ is orthogonal and symmetric
-
-__Proof:__
-
-The matrix $H$ is symmetric since $I$ is symmetric, and $uu^T$ is also symmetric. Symmetric matrices are closed under addition.
-
-Check if $H^TH = I$:
-
-$$H^TH$$
-$$=H^2$$
-$$=(I - 2uu^T)^2$$
-
-$$= I - 4uu^T + 4(uu^T)(uu^T)$$
-$$= I - 4uu^T + 4u(u^Tu)u^T$$
-$$=I\quad{} \textbf{QED}$$
-"
-
-# ╔═╡ 954bdf08-562c-4daf-a855-8f5d2004aa8b
-md"
-See below. Sorry, I couldn't plot it beautifully.
-
-(1,0) has been rotated by 30 degrees. (0,1) is now the down facing arrow.
-Notice how the line $\frac{\theta{}}{2}$ is the mirror and the images are the reflection of their corresponding pre-images. This is what Householder's rotation does!
-"
-
-# ╔═╡ 245f2e27-d4a0-4a95-99c6-105b5bbfc3c1
-md"
----
-"
-
-# ╔═╡ 25adb671-c2e3-4a05-bbce-d12f4f10088d
-md"
-## Hadamard Matrices
-
-These matrices go like
-
-$$H_n = \begin{bmatrix}
-H_{\frac{n}{2}} & H_{\frac{n}{2}}\\
-H_{\frac{n}{2}} & -H_{\frac{n}{2}}\\
-\end{bmatrix}$$
-
-$$H_2 = \frac{1}{\sqrt{2}}\begin{bmatrix}
-1 & 1\\
-1 & -1\\
-\end{bmatrix}$$
-
-$$H_4 = \begin{bmatrix}
-H_{2} & H_{2}\\
-H_{2} & -H_{2}\\
-\end{bmatrix}
-= \begin{bmatrix}
-1 & 1 & 1 & 1\\
-1 & -1 & 1 & -1\\
-1 & 1 & -1 & -1\\
-1 & -1 & -1 & 1\\
-\end{bmatrix}$$
-"
-
-# ╔═╡ e384cf89-f714-486a-ba25-eecb67ca602b
+# ╔═╡ c3fe4331-c6de-4802-b522-b778c5f0db0e
 begin
-	import Hadamard
-	n = 16
-	h_n = Hadamard.hadamard(n)
-	# For some reason, plotting raw hadamard would plot it upside down
-	# so i had to fix it using permutation
-	h16 = 
-	Plots.heatmap(h_n, levels=2, aspect_ratio=1, axis=false)
+	import LinearAlgebra as la
+	u = la.normalize(rand(2,1))
+	v = la.normalize(rand(2,1))
+	ut = transpose(u)
+	w = v - u * (ut * v)
+	# These computers! Arrgh! Can't even write zero properly
+	la.dot(u,w)
 end
 
-# ╔═╡ 1997d979-1450-44e4-a659-5db8eda10893
+# ╔═╡ 93691031-83c4-45ba-b94c-12a9ac303cda
+md"
+The lower one is $\textbf{u}$. The one perpendicular to it is $\textbf{w}$. The remaining one in the middle is $\textbf{v}$.
+"
+
+# ╔═╡ 4ca26d94-4e68-4ea2-b690-0d37e68a02a3
 md"
 ---
 "
 
-# ╔═╡ 0737dfec-dc4b-4310-9e79-d867fb3032db
+# ╔═╡ fa9407fe-fb25-4d99-bd18-c081a2874e9d
 md"
-## Wavelet Matrices
+## 4
 
-Remeber this order
-
-+ Average
-+ Half Difference
-+ Smaller Differences
-
-These matrices show these property
-
-$$W4 = \begin{bmatrix}
-1 & 1 & 1 & 0\\
-1 & 1 & -1 & 0\\
-1 & -1 & 0 & 1\\
-1 & -1 & 0 & -1\\
-\end{bmatrix}$$
-
-$$W_8 = \left[
-\begin{array}{cccccccc}
-1 & 1 & 1 & 0 & 1 & 0 & 0 & 0 \\
-1 & 1 & 1 & 0 & -1 & 0 & 0 & 0 \\
-1 & 1 & -1 & 0 & 0 & 1 & 0 & 0 \\
-1 & 1 & -1 & 0 & 0 & -1 & 0 & 0 \\
-1 & -1 & 0 & 1 & 0 & 0 & 1 & 0 \\
-1 & -1 & 0 & 1 & 0 & 0 & -1 & 0 \\
-1 & -1 & 0 & -1 & 0 & 0 & 0 & 1 \\
-1 & -1 & 0 & -1 & 0 & 0 & 0 & -1 \\
-\end{array}
-\right]$$
-
-It's almost unbelievable that all these matrices are orthogonal!
-I wonder where they are used!
+IIRC, this was already covered in the notes!
 
 ---
 "
 
-# ╔═╡ 87523e56-407f-4616-b633-c8669959088f
+# ╔═╡ ac5c7db2-1e40-4c21-9d25-3ff601a9694b
 md"
-## Fourier Matrix
+## 6
 
-+ You might know that eigenvectors of symmetric matrices are orthogonal
-+ It is also true that eigenvectors of orthogonal matrices are orthogonal
+As far as I can see, each column has a 1 in its own unique position (No other columns have 1 at that same position), and rest of the entries are zero. That means the columns are perpendicular. So,
 
-This simple permutation/orthonormal matrix
-
-$$\left[
-\begin{array}{cccc}
-0 & 1 & 0 & 0 \\
-0 & 0 & 1 & 0 \\
-0 & 0 & 0 & 1 \\
-1 & 0 & 0 & 0 \\
-\end{array}
-\right]$$
-
-has eigenvector matrix that is very special. It is
-
-$$F_4 = \left[
-\begin{array}{cccc}
-1 & 1 & 1 & 1 \\
-1 & \textit{i} & \textit{i}^2 & \textit{i}^3 \\
-1 & \textit{i}^2 & \textit{i}^4 & \textit{i}^6 \\
-1 & \textit{i}^3 & \textit{i}^6 & \textit{i}^9 \\
-\end{array}
-\right]$$
-
-Some of these matrices will be covered in other units, hopefully.
+$$P^TP = I$$
+$$P^{-1} = P^T$$
 "
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-Hadamard = "4a05ff16-5f95-55f4-bb53-bb3f467c689a"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [compat]
-Hadamard = "~1.4.0"
 Plots = "~1.19.4"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
-
-[[AbstractFFTs]]
-deps = ["LinearAlgebra"]
-git-tree-sha1 = "485ee0867925449198280d4af84bdb46a2a404d0"
-uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
-version = "1.0.1"
 
 [[Adapt]]
 deps = ["LinearAlgebra"]
@@ -383,18 +215,6 @@ git-tree-sha1 = "3cc57ad0a213808473eafef4845a74766242e05f"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "4.3.1+4"
 
-[[FFTW]]
-deps = ["AbstractFFTs", "FFTW_jll", "LinearAlgebra", "MKL_jll", "Preferences", "Reexport"]
-git-tree-sha1 = "f985af3b9f4e278b1d24434cbb546d6092fca661"
-uuid = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
-version = "1.4.3"
-
-[[FFTW_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "3676abafff7e4ff07bbd2c42b3d8201f31653dcc"
-uuid = "f5851436-0d7a-5f13-b9de-f02708fd171a"
-version = "3.3.9+8"
-
 [[FixedPointNumbers]]
 deps = ["Statistics"]
 git-tree-sha1 = "335bfdceacc84c5cdf16aadc768aa5ddfc5383cc"
@@ -472,23 +292,11 @@ git-tree-sha1 = "c6a1fff2fd4b1da29d3dccaffb1e1001244d844e"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 version = "0.9.12"
 
-[[Hadamard]]
-deps = ["AbstractFFTs", "FFTW", "LinearAlgebra"]
-git-tree-sha1 = "fe099f8dd9b50154705cd1605685dfd21d427de8"
-uuid = "4a05ff16-5f95-55f4-bb53-bb3f467c689a"
-version = "1.4.0"
-
 [[IniFile]]
 deps = ["Test"]
 git-tree-sha1 = "098e4d2c533924c921f9f9847274f2ad89e018b8"
 uuid = "83e8ac13-25f8-5344-8a64-a9f2b223428f"
 version = "0.5.0"
-
-[[IntelOpenMP_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "d979e54b71da82f3a65b62553da4fc3d18c9004c"
-uuid = "1d5cc7b8-4909-519e-a0f8-d0f5ad9712d0"
-version = "2018.0.3+2"
 
 [[InteractiveUtils]]
 deps = ["Markdown"]
@@ -544,10 +352,6 @@ deps = ["Formatting", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdow
 git-tree-sha1 = "a4b12a1bd2ebade87891ab7e36fdbce582301a92"
 uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 version = "0.15.6"
-
-[[LazyArtifacts]]
-deps = ["Artifacts", "Pkg"]
-uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 
 [[LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -628,12 +432,6 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
-
-[[MKL_jll]]
-deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg"]
-git-tree-sha1 = "c253236b0ed414624b083e6b72bfe891fbd2c7af"
-uuid = "856f044c-d86e-5d09-b602-aeab76dc8ba7"
-version = "2021.1.1+1"
 
 [[MacroTools]]
 deps = ["Markdown", "Random"]
@@ -1099,17 +897,13 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─6b8adf4c-f0f8-11eb-384c-bfb58bdd7eac
-# ╟─6f5601b2-da4e-4fb8-b820-e912cd39be35
-# ╟─4ae1fd26-3840-4478-91d1-fc791c360b21
-# ╟─6a387f58-76e2-428c-a6e7-ba5b6446a32d
-# ╟─954bdf08-562c-4daf-a855-8f5d2004aa8b
-# ╠═cdb20e14-3483-443a-b279-da513c5523cb
-# ╟─245f2e27-d4a0-4a95-99c6-105b5bbfc3c1
-# ╟─25adb671-c2e3-4a05-bbce-d12f4f10088d
-# ╠═e384cf89-f714-486a-ba25-eecb67ca602b
-# ╟─1997d979-1450-44e4-a659-5db8eda10893
-# ╟─0737dfec-dc4b-4310-9e79-d867fb3032db
-# ╟─87523e56-407f-4616-b633-c8669959088f
+# ╟─2b881548-f15b-11eb-3557-03f23356fea2
+# ╟─7c481e3e-187c-46de-bcbe-f53b05a72130
+# ╠═c3fe4331-c6de-4802-b522-b778c5f0db0e
+# ╟─93691031-83c4-45ba-b94c-12a9ac303cda
+# ╠═4d0a276d-e52e-42bb-81b3-228e5eb40695
+# ╟─4ca26d94-4e68-4ea2-b690-0d37e68a02a3
+# ╟─fa9407fe-fb25-4d99-bd18-c081a2874e9d
+# ╟─ac5c7db2-1e40-4c21-9d25-3ff601a9694b
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
