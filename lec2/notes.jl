@@ -161,9 +161,41 @@ These individual terms are the rank one matrices (column times a row)
 Every symmetric matrix $S$ has $n$ real eigenvalues and $n$ orthonormal eigenvectors.
 "
 
+# ╔═╡ f756c8af-3a77-40d2-a483-8b9dd56acbc3
+md"
+## The Four Fundamental Subspaces
+
++ The *column space* is the span of the columns of $A$. It's denoted by $C(A)$.
++ The *row space* is the span of all the rows of $A$. It's denoted by $C(A^T)$, meaning that it's also the column space of $A^T$.
++ The *null space* is the set of all solutions to $Ax = 0$. It's denoted by $N(A)$.
++ The *left null space* is the set of all solutions to $A^Tx = 0$. It's denoted by $N(A^T)$.
+
+Here's the [Big Picture](https://ocw.mit.edu/courses/mathematics/18-06sc-linear-algebra-fall-2011/ax-b-and-the-four-subspaces/Unit_1_WIDE.jpg)
+
++ Row space and null space are in $\mathbf{R^n}$.
++ Column space and left nullspace arer in $\mathbf{R^m}$.
+
++ Dimension of column space is the number of independent columns = $r$, because $r$ independent vectors can make an $r$ dimensional hyperplane.
++ Similarly, the dimension of row space is $r$, because number of independent rows = number of independent columns.
+
++ Since the number of free variables in $\mathbf{R^n}$ is $n-r$, it's the dimension of null space.
++ The dimension of left null space is $m-r$ similarly.
+
+__Bonus:__
+
++ Row space and null space are orthogonal. The equation $Ax = 0$ screams this. The dot product of any vector in the null space with each row is zero, i.e. they are perpendicular. Any vector in the row space is combination of these rows. Hence, any vector in the row space is perpendicular to any vector in the row space.
+
++ Similarly, column space and the left null space are orthogonal.
+
++ Any vector in $\mathbf{R^n}$ is a combination of basis of row space and the basis of  null space. When $A$ multiplies this vector, the components from the null space move to $0$ and the ones from the row space move to the column space.
+
++ Thus, if $b$ is not in the column space, $Ax=b$ is unsolvable. $b$ has to be projected to the column space of $A$, then only we can solve for $x$.
+"
+
 # ╔═╡ Cell order:
 # ╟─8bd5849e-eefe-11eb-1dfd-2dd611a2a88d
 # ╟─691d613e-6f00-4d89-a4b7-e3377946f921
 # ╟─c70d2ae7-aa70-4dc0-8b6a-2119f19ac619
 # ╟─964de7b5-3ea2-4ea0-8622-0c43ad5a3617
 # ╟─a8be649e-deb2-4ac7-8fee-2664e1e1b42c
+# ╟─f756c8af-3a77-40d2-a483-8b9dd56acbc3
