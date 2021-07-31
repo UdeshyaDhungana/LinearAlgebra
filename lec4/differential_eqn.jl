@@ -175,7 +175,74 @@ Let's plot it to understand it better
 md"
 Woah! Maybe that's what the mathematicians are trying to say. That no feelings are permanent, whether good or bad! Feelings wax and wan!
 
-I got to learn about differential equations and you got to see the mathematical side of relationships. 🥳
+---
+"
+
+# ╔═╡ a95c4ea7-3f8f-4d54-abff-824866533df6
+md"
+## Exponential of a Matrix
+
+What can be the value of $e^{At}$?
+
+Just as we do in the case of real number, let's exand this using Taylor's series.
+
+$$e^{At} = I + At + \frac{1}{2!}(At)^2 + \frac{1}{3!}(At)^3 + \cdots$$
+
+Verify using the fact that
+
+$$\frac{de^{At}}{dt} = Ae^{At}$$
+
+What are its eigenvalues?
+
+Its eigenvalues are $e^{\lambda{}t}$ because
+
+$$(I + At + \frac{1}{2}(At)^2 + \dots )\textbf{x} = (1 + \lambda{}t + \frac{1}{2}(\lambda{}t)^2 + ... )\textbf{x}$$
+
+given that $\textbf{x}$ is an eigenvector of $A$ and $\lambda{}$ is the corresponding eigenvalue.
+
+Eigenvector of $e^{At}$ is same as that of $A$.
+
+The diagonalization of $e^{At}$ is given as
+
+$$e^{At} = \textbf{X}e^{\Lambda{}t}\textbf{X}^{-1}$$
+
+Remeber the solution of $u(t)$ from last section. It can be written in the matrix form as
+
+$$e^{At}\textbf{u}(0)$$
+
+$$= Xe^{\Lambda{}t}X^{-1}\textbf{u}(0)$$
+
+
+$$= Xe^{\Lambda{}t}X^{-1}\textbf{c}$$
+
+
+$$=\begin{bmatrix}
+ &  &  \\
+x_1 & \cdots & x_n\\
+ &  & \\
+\end{bmatrix}
+
+\begin{bmatrix}
+e^{\lambda_1t} & & \\
+ & \ddots & \\
+ & & e^{\lambda_nt}\\
+\end{bmatrix}
+
+\begin{bmatrix}
+c_1\\
+\vdots\\
+c_n\\
+\end{bmatrix}$$
+
+$$=c_1e^{\lambda_1t}x_1 + \cdots + c_ne^{\lambda_nt}x_n$$
+
+__Steps to compute solution:__
+
+1. Find $\lambda{}$s, the eigenvalues;and $X$, the eigenvectors.
+
+2. Write $e^{\Lambda{}t}$ as raising the diagonal entries of $\Lambda$ by $e^t$.
+
+3. Write $u(t) = Xe^{\Lambda{}t}X^{-1}u(0) = Xe^{\Lambda{}t}c$
 
 ---
 "
@@ -997,5 +1064,6 @@ version = "0.9.1+5"
 # ╟─ed5d1166-de4b-4120-af8e-abe2041489aa
 # ╠═372ae980-5dd3-42a4-ae1b-bfd10584b615
 # ╟─df16808b-bad9-43a1-9579-85ca091c630e
+# ╟─a95c4ea7-3f8f-4d54-abff-824866533df6
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
