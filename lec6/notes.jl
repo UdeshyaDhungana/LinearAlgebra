@@ -4,268 +4,244 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ cdb20e14-3483-443a-b279-da513c5523cb
+# ╔═╡ 9dda7ea2-6d8a-4b12-bff0-193c26a2d73c
+begin
+	using LinearAlgebra
+	using PlutoUI
+	A = [1 -1; -0.5 0.8]
+	u, sigma, vt = svd(A)
+	object = [1 0; 0 1]
+	first_rotated = vt * object
+	scaled = (sigma .* Matrix(I, size(A))) * first_rotated
+	image = u * scaled
+	with_terminal() do
+		println(object)
+		println(norm(object))
+		
+		println()
+		
+		println(first_rotated)
+		println(norm(first_rotated))
+		
+		println()
+		
+		println(scaled)
+		println(norm(scaled))
+		
+		println()
+		
+		println(image)
+		println(norm(image))
+	end
+end
+
+# ╔═╡ ea515ece-f662-11eb-2dc7-7793e353bd97
+md"
+# Lecture 6
+"
+
+# ╔═╡ 6d9ecb41-5b09-4c42-9757-f809312be8ee
+md"
+## Introduction
+
+We have already seen matrix decompositions like $LU$ decomposition, Gram-Schmidt $QR$ decomposition, diagonalization $X\Lambda{}X^{-1}$, and $Q\Lambda{}Q^T$, the decomposition of symmetric matrices. There is another precious matrix decomposition called Singular Value Decomposition, or SVD.
+"
+
+# ╔═╡ 80f57ce8-64b5-415d-be3d-9e100501a4c7
+md"
+## Singular Value Decomposition
+
+The expression for SVD is
+
+$$A = U\Sigma{}V^T$$
+
+It is generalization of diagonalization process. For diagonalization, $A$ has to be a square matrix, otherwise eigenvalues and eigenvectors would not even exist (Transformation takes place from $\mathbf{R^n}$ to $\mathbf{R^m}$). SVD is applicable for all matrices, even rectangular! That's why it's so useful.
+
+The $u_i$ are called the left singular vectors, and $v_i$ are called right singular vectors. For a real $m\times{}n$ matrices, $v_i$ are in $\mathbf{R^n}$ and the $u_i$ are in $\mathbf{R^m}$.
+
+The $V$ is an orthogonal matrix. It forms a basis for row space of $A$. It is transformed by $A$ to another orthogonal matrix $U$, which forms the basis for column space.
+
+Individually, this can be written as
+
+$$Av_1 = \sigma_1u_1$$
+$$\vdots{}$$
+$$Av_r = \sigma_ru_r$$
+$$Av_{r+1} = 0$$
+$$\vdots{}$$
+$$Av_n = 0$$
+
+We express these such that $\sigma_i >= \sigma_j$ for $i<j$, i.e. in descending order
+
+In matrix form,
+
+$$A\begin{bmatrix}
+ & & & & \\
+v_1 & \dots & v_r & \dots & v_n\\
+ & & & & \\
+\end{bmatrix}
+=\begin{bmatrix}
+ & & & & \\
+u_1 & \dots & u_r & \dots & u_m\\
+ & & & & \\
+\end{bmatrix}
+\begin{bmatrix}
+\sigma_1 & & & \\
+ & \ddots &  & 0\\
+ &  & \sigma_r & \\
+ & 0 & & 0\\
+\end{bmatrix}$$
+
+The $v_1$, $\dots$ , $v_r$ form the basis of row space
+
+The $u_1$, $\dots$ , $u_r$ form the basis of column space
+
+The $v_{r+1}$, $\dots$ , $v_n$ form the basis of null space
+
+The $u_{r+1}$, $\dots$ , $u_n$ form the basis of left null space
+
+---
+"
+
+# ╔═╡ 09952b14-548c-435f-99b7-6e67b7c0dcbe
+md"
+## $U$ and $V$
+
+What are the matrices $U$ and $V$? They are the eigenvector matrices of $AA^T$ and $A^TA$. 
+
+Diagonalize $A^TA$
+
+$$A^TA$$
+$$=(u\Sigma{}v^T)^T(u\Sigma{}v^T)$$
+$$=v\Sigma^Tu^Tu\Sigma{}v^T$$
+$$=v\Sigma^2v^T$$
+
+Vectors $v$ are the eigenvectors of $A^TA$.
+
+**Proof**
+
+The $v_i$ are orthonormal, but how are $u_i$ also orthonormal? If we can prove this, we prove SVD
+
+$$u_1^Tu_2$$
+$$=\left(\frac{Av_1}{\sigma_1}\right)^T\left(\frac{Av_2}{\sigma_2}\right)$$
+$$=\frac{v_1^TA^TAv_2}{\sigma_1\sigma_2}$$
+$$=\frac{v_1\sigma_2^2v_2}{\sigma_1\sigma_2}$$
+$$=\frac{\sigma_2}{\sigma_1}v_1^Tv_2$$
+$$=0$$
+
+Repeat the same process above and you'll see that $u$ are the eigenvectors of $AA^T$. 
+
+Since $v$ are orthogonal, $V^{-1} = V^T$. So we can write 
+
+$$AV = U\Sigma{}$$
+$$A = U\Sigma{}V^T$$
+
+$$A = \sigma_1u_1v_1^T + \dots + \sigma_ru_rv_r^T$$
+
+We see that $A$ is the sum of $r$ rank one matrices. Since $\sigma_1 \geq \sigma_2$ and so on, the first term contributes most to the matrix. The last term contributes least to the matrix. The first term is the top principal part.
+
+
+
+---
+"
+
+# ╔═╡ b343b35a-a4d5-45cd-b1dc-1dcbc7dbf1e2
+md"
+## Geometry of SVD
+
+A orthonormal matrix does not change the magnitude of the vector which it transforms.
+
+$$A = U\Sigma{}V^T$$
+
+This shows that a transformation $A$ is the composite transformation of $V^T$ (a rotation), $\Sigma{}$ (a stretch along the axes), and $U$ (another rotation).
+
+Let me show this
+"
+
+# ╔═╡ 7738f604-f86d-4721-8272-75fb89757d35
+origin = [0, 0]
+
+# ╔═╡ 01498738-e8d6-4140-8458-c6a1b0918254
 begin
 	using Plots
-	orig = [0, 0, 0, 0]
-	t = pi/6
-	c, s = cos(t), sin(t)
-	objects = [1 0;0 1]
-	h = [c s;s -c]
-	images = h * objects
-	xs = [objects[1,:]' images[1,:]']
-	ys = [objects[2,:]' images[2,:]']
-	
-	# separator line
-	x = Array(range(-0.5,1,step=0.05))
-	y = x * tan(t/2)
-	scatter(x,y)
-	quiver!(orig, orig, quiver=(xs, ys), aspect_ratio=1, legend=false)
+	quiver(origin, origin, quiver=(object[1,:], object[2,:]), aspect_ratio=1, legend=false, title="Original")
 end
 
-# ╔═╡ 6b8adf4c-f0f8-11eb-384c-bfb58bdd7eac
-md"
-# Lecture 3
-
-## $Q^TQ = I$
-
-+ Two vectors are perpendicular if their dot product is 0, i.e. $x^Tx = 0$.
-
-
-+ A matrix whose columns are all perpendicular to each other is called orthogonal matrix.
-
-
-+ An orthogonal matrix whose columns are of unit length is called orthonormal matrix.
-
-
-+ Orthogonal matrix can be converted to orthonormal columns by normalizing the columns.
-
-
-+ Orthogonal matrix are normally denoted as $Q$.
-
-
-+ Orthonormal Columns can be written as $Q^TQ = I$ because, dot product of each column with itself would give $1$, which are the diagonal entries in $I$, and all the other dot products are $0$, the non-diagonal entries.
-
-
-+ Remember, that it also means $Q^TQ = I \implies Q^T = Q^{-1}$ if $Q$ is square.
-
-
-+ Also, $QQ^T = I$ if $Q$ is square.
-
-"
-
-# ╔═╡ 6f5601b2-da4e-4fb8-b820-e912cd39be35
-md"
-## Some famous orthogonal/orthonormal matrices
-"
-
-# ╔═╡ 4ae1fd26-3840-4478-91d1-fc791c360b21
-md"
-### 1. Rotation Matrix
-
-$Q = \begin{bmatrix}
-cos\theta{} & -sin\theta{}\\
-sin\theta{} & cos\theta{}
-\end{bmatrix}$
-$Q^T = Q^{-1}$.
-
-###### Rotation matrix keeps length constant
-__Proof:__
-
-$$||{Qx}||^2
-= (Qx)^T(Qx)
-= x^TQ^TQx
-= x^Tx$$
-
-Computations with $Q$ never overflow!
-
----
-"
-
-# ╔═╡ 6a387f58-76e2-428c-a6e7-ba5b6446a32d
-md"
-### 2. Householder's Reflection Matrix
-
-$Q = \begin{bmatrix}
-cos\theta{} & sin\theta{}\\
-sin\theta{} & -cos\theta{}
-\end{bmatrix}$
-
-+ It is symmetric
-+ It is a reflection matrix
-+ Its determinant is $1$.
-
-#### General Case:
-
-1. Start with a unit vector $u^Tu = 1$.
-2. The matrices $H = I - 2uu^T$ is family of Householder's Transformation Matrices
-
-
-__Claim:__ $H$ is orthogonal and symmetric
-
-__Proof:__
-
-The matrix $H$ is symmetric since $I$ is symmetric, and $uu^T$ is also symmetric. Symmetric matrices are closed under addition.
-
-Check if $H^TH = I$:
-
-$$H^TH$$
-$$=H^2$$
-$$=(I - 2uu^T)^2$$
-
-$$= I - 4uu^T + 4(uu^T)(uu^T)$$
-$$= I - 4uu^T + 4u(u^Tu)u^T$$
-$$=I\quad{} \textbf{QED}$$
-"
-
-# ╔═╡ 954bdf08-562c-4daf-a855-8f5d2004aa8b
-md"
-See below. Sorry, I couldn't plot it beautifully.
-
-(1,0) has been rotated by 30 degrees. (0,1) is now the down facing arrow.
-Notice how the line $\frac{\theta{}}{2}$ is the mirror and the images are the reflection of their corresponding pre-images. This is what Householder's rotation does!
-"
-
-# ╔═╡ 245f2e27-d4a0-4a95-99c6-105b5bbfc3c1
-md"
----
-"
-
-# ╔═╡ 25adb671-c2e3-4a05-bbce-d12f4f10088d
-md"
-## Hadamard Matrices
-
-These matrices go like
-
-$$H_n = \begin{bmatrix}
-H_{\frac{n}{2}} & H_{\frac{n}{2}}\\
-H_{\frac{n}{2}} & -H_{\frac{n}{2}}\\
-\end{bmatrix}$$
-
-$$H_2 = \frac{1}{\sqrt{2}}\begin{bmatrix}
-1 & 1\\
-1 & -1\\
-\end{bmatrix}$$
-
-$$H_4 = \begin{bmatrix}
-H_{2} & H_{2}\\
-H_{2} & -H_{2}\\
-\end{bmatrix}
-= \begin{bmatrix}
-1 & 1 & 1 & 1\\
-1 & -1 & 1 & -1\\
-1 & 1 & -1 & -1\\
-1 & -1 & -1 & 1\\
-\end{bmatrix}$$
-"
-
-# ╔═╡ e384cf89-f714-486a-ba25-eecb67ca602b
+# ╔═╡ aff6ee03-bb2e-4747-91fa-4474b0227361
 begin
-	import Hadamard
-	n = 16
-	h_n = Hadamard.hadamard(n)
-	Plots.heatmap(h_n, levels=2, aspect_ratio=1, axis=false)
+	quiver(origin, origin, quiver=(first_rotated[1,:], first_rotated[2,:]), aspect_ratio=1, legend=false, title="First Rotation")
 end
 
-# ╔═╡ 1997d979-1450-44e4-a659-5db8eda10893
+# ╔═╡ 2ef19145-f392-4823-9a28-86afebd4cec3
+begin
+	quiver(origin, origin, quiver=(scaled[1,:], scaled[2,:]), aspect_ratio=1, legend=false)
+end
+
+# ╔═╡ dfc28244-e4a8-4f82-b88e-0bae5e2f778d
+begin
+	quiver(origin, origin, quiver=(image[1,:], image[2,:]), aspect_ratio=1, legend=false)
+end
+
+# ╔═╡ cdd3cfec-0060-4b32-978f-9ae137ea9f43
 md"
+Notice how the angle between the vectors in the first two transformations and the last two transformations remain unchanged. Those are the effect from the $V^T$ and $U$ respectively. The matrix $\Sigma$ stretches the vectors along the axes. 
+
 ---
 "
 
-# ╔═╡ 0737dfec-dc4b-4310-9e79-d867fb3032db
+# ╔═╡ dc7d1023-8890-412c-b055-cb3dd71ef0c5
 md"
-## Wavelet Matrices
+## Number of elements
 
-Remeber this order
+A $2\times{}2$ matrix has $4$ elements. It means something. The two elements are the angles of rotation in $U$ and $V^T$ (Remember $U$ and $V^T$ can be expressed as rotation matrices with rotation angles $\theta$ and $\phi$ respectively. Another two values are from the stretching along the axes. The SVD gives the clear picture of this thing.
 
-+ Average
-+ Half Difference
-+ Smaller Differences
+In a $3\times{}3$ matrix, there are $9$ elements. $3$ are the entries in $\Sigma$. The other $3$ each belong to $U$ and $v^T$. Rotation in $3$ dimension is specified by $3$ values, rotation along the 3 axes! Remember, roll, pitch and yaw!
 
-These matrices show these property
-
-$$W4 = \begin{bmatrix}
-1 & 1 & 1 & 0\\
-1 & 1 & -1 & 0\\
-1 & -1 & 0 & 1\\
-1 & -1 & 0 & -1\\
-\end{bmatrix}$$
-
-$$W_8 = \left[
-\begin{array}{cccccccc}
-1 & 1 & 1 & 0 & 1 & 0 & 0 & 0 \\
-1 & 1 & 1 & 0 & -1 & 0 & 0 & 0 \\
-1 & 1 & -1 & 0 & 0 & 1 & 0 & 0 \\
-1 & 1 & -1 & 0 & 0 & -1 & 0 & 0 \\
-1 & -1 & 0 & 1 & 0 & 0 & 1 & 0 \\
-1 & -1 & 0 & 1 & 0 & 0 & -1 & 0 \\
-1 & -1 & 0 & -1 & 0 & 0 & 0 & 1 \\
-1 & -1 & 0 & -1 & 0 & 0 & 0 & -1 \\
-\end{array}
-\right]$$
-
-It's almost unbelievable that all these matrices are orthogonal!
-I wonder where they are used!
+---
 "
 
-# ╔═╡ 6607500c-fb94-401d-ad88-8abeaf6f9729
-begin
-	w16 = [1 1 1 0 1 0 0 0;1 1 1 0 -1 0 0 0; 1 1 -1 0 0 1 0 0; 1 1 -1 0 0 -1 0 0 ; 1 -1 0 1 0 0 1 0; 1 -1 0 1 0 0 -1 0; 1 -1 0 -1 0 0 0 1;1 -1 0 -1 0 0 0 -1]
-	Plots.heatmap(w16, levels=2, aspect_ratio=1, axis=false, title="Wavelet matrix")
-end
-
-# ╔═╡ 87523e56-407f-4616-b633-c8669959088f
+# ╔═╡ 3f49cda1-bac3-4f66-b7b2-5f376e230e0b
 md"
-## Fourier Matrix
+## Polar Decomposition
 
-+ You might know that eigenvectors of symmetric matrices are orthogonal
-+ It is also true that eigenvectors of orthogonal matrices are orthogonal
+As a complex number can be expressed in polar form $re^{i\theta}$, polar decomposition is possible for matrices.
 
-This simple permutation/orthonormal matrix
+$$A = U\Sigma{}V^T$$
+$$A = U\Sigma{}U^TUV^T$$
+$$A = (U\Sigma{}U^T)(UV^T)$$
 
-$$\left[
-\begin{array}{cccc}
-0 & 1 & 0 & 0 \\
-0 & 0 & 1 & 0 \\
-0 & 0 & 0 & 1 \\
-1 & 0 & 0 & 0 \\
-\end{array}
-\right]$$
+The first part is the symmetric matrix, the latter one is orthogonal matrix. Notice how it corresponds to polar form, $e^{i\theta{}}$ has magnitude $1$, just like the orthogonal matrix!
 
-has eigenvector matrix that is very special. It is
+---
+"
 
-$$F_4 = \left[
-\begin{array}{cccc}
-1 & 1 & 1 & 1 \\
-1 & \textit{i} & \textit{i}^2 & \textit{i}^3 \\
-1 & \textit{i}^2 & \textit{i}^4 & \textit{i}^6 \\
-1 & \textit{i}^3 & \textit{i}^6 & \textit{i}^9 \\
-\end{array}
-\right]$$
+# ╔═╡ 62794a81-e1fa-4c0c-b0cd-c04007b1197a
+md"
+## Extras
 
-Some of these matrices will be covered in other units, hopefully.
++ The decompositions $A = U\Sigma{}V^T$ and $A = X\Lambda{}X^{-1}$ are same when $U = V = X$. Also, $\lambda_i \geq 0$, because $\Sigma{}$ only has positive entries. Thus, The condition holds, when $A$ is symmetric (semi) positive definite
+
++ The $\sigma_i$ are always non negative because they are eigenvalues of $A^TA$, which is a symmetric (semi)positive definite matrix
+
++ Matrices $A^TA$ and $AA^T$, both are symmetric PD, and are similar!
+
+---
 "
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-Hadamard = "4a05ff16-5f95-55f4-bb53-bb3f467c689a"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
-Hadamard = "~1.4.0"
-Plots = "~1.19.4"
+Plots = "~1.20.0"
+PlutoUI = "~0.7.9"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
-
-[[AbstractFFTs]]
-deps = ["LinearAlgebra"]
-git-tree-sha1 = "485ee0867925449198280d4af84bdb46a2a404d0"
-uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
-version = "1.0.1"
 
 [[Adapt]]
 deps = ["LinearAlgebra"]
@@ -384,18 +360,6 @@ git-tree-sha1 = "3cc57ad0a213808473eafef4845a74766242e05f"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "4.3.1+4"
 
-[[FFTW]]
-deps = ["AbstractFFTs", "FFTW_jll", "LinearAlgebra", "MKL_jll", "Preferences", "Reexport"]
-git-tree-sha1 = "f985af3b9f4e278b1d24434cbb546d6092fca661"
-uuid = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
-version = "1.4.3"
-
-[[FFTW_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "3676abafff7e4ff07bbd2c42b3d8201f31653dcc"
-uuid = "f5851436-0d7a-5f13-b9de-f02708fd171a"
-version = "3.3.9+8"
-
 [[FixedPointNumbers]]
 deps = ["Statistics"]
 git-tree-sha1 = "335bfdceacc84c5cdf16aadc768aa5ddfc5383cc"
@@ -434,15 +398,15 @@ version = "3.3.5+0"
 
 [[GR]]
 deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Printf", "Random", "Serialization", "Sockets", "Test", "UUIDs"]
-git-tree-sha1 = "9f473cdf6e2eb360c576f9822e7c765dd9d26dbc"
+git-tree-sha1 = "182da592436e287758ded5be6e32c406de3a2e47"
 uuid = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
-version = "0.58.0"
+version = "0.58.1"
 
 [[GR_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Pkg", "Qt5Base_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "eaf96e05a880f3db5ded5a5a8a7817ecba3c7392"
+git-tree-sha1 = "d59e8320c2747553788e4fc42231489cc602fa50"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
-version = "0.58.0+0"
+version = "0.58.1+0"
 
 [[GeometryBasics]]
 deps = ["EarCut_jll", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
@@ -469,27 +433,15 @@ version = "1.0.2"
 
 [[HTTP]]
 deps = ["Base64", "Dates", "IniFile", "Logging", "MbedTLS", "NetworkOptions", "Sockets", "URIs"]
-git-tree-sha1 = "c6a1fff2fd4b1da29d3dccaffb1e1001244d844e"
+git-tree-sha1 = "44e3b40da000eab4ccb1aecdc4801c040026aeb5"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
-version = "0.9.12"
-
-[[Hadamard]]
-deps = ["AbstractFFTs", "FFTW", "LinearAlgebra"]
-git-tree-sha1 = "fe099f8dd9b50154705cd1605685dfd21d427de8"
-uuid = "4a05ff16-5f95-55f4-bb53-bb3f467c689a"
-version = "1.4.0"
+version = "0.9.13"
 
 [[IniFile]]
 deps = ["Test"]
 git-tree-sha1 = "098e4d2c533924c921f9f9847274f2ad89e018b8"
 uuid = "83e8ac13-25f8-5344-8a64-a9f2b223428f"
 version = "0.5.0"
-
-[[IntelOpenMP_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "d979e54b71da82f3a65b62553da4fc3d18c9004c"
-uuid = "1d5cc7b8-4909-519e-a0f8-d0f5ad9712d0"
-version = "2018.0.3+2"
 
 [[InteractiveUtils]]
 deps = ["Markdown"]
@@ -513,9 +465,9 @@ version = "1.3.0"
 
 [[JSON]]
 deps = ["Dates", "Mmap", "Parsers", "Unicode"]
-git-tree-sha1 = "81690084b6198a2e1da36fcfda16eeca9f9f24e4"
+git-tree-sha1 = "8076680b162ada2a031f707ac7b4953e30667a37"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
-version = "0.21.1"
+version = "0.21.2"
 
 [[JpegTurbo_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -545,10 +497,6 @@ deps = ["Formatting", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdow
 git-tree-sha1 = "a4b12a1bd2ebade87891ab7e36fdbce582301a92"
 uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 version = "0.15.6"
-
-[[LazyArtifacts]]
-deps = ["Artifacts", "Pkg"]
-uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 
 [[LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -630,17 +578,11 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
-[[MKL_jll]]
-deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg"]
-git-tree-sha1 = "c253236b0ed414624b083e6b72bfe891fbd2c7af"
-uuid = "856f044c-d86e-5d09-b602-aeab76dc8ba7"
-version = "2021.1.1+1"
-
 [[MacroTools]]
 deps = ["Markdown", "Random"]
-git-tree-sha1 = "6a8a2a625ab0dea913aba95c11370589e0239ff0"
+git-tree-sha1 = "0fb723cd8c45858c22169b2e42269e53271a6df7"
 uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
-version = "0.5.6"
+version = "0.5.7"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -712,9 +654,9 @@ version = "8.44.0+0"
 
 [[Parsers]]
 deps = ["Dates"]
-git-tree-sha1 = "94bf17e83a0e4b20c8d77f6af8ffe8cc3b386c0a"
+git-tree-sha1 = "477bf42b4d1496b454c10cce46645bb5b8a0cf2c"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "1.1.1"
+version = "2.0.2"
 
 [[Pixman_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -740,9 +682,15 @@ version = "1.0.11"
 
 [[Plots]]
 deps = ["Base64", "Contour", "Dates", "FFMPEG", "FixedPointNumbers", "GR", "GeometryBasics", "JSON", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs"]
-git-tree-sha1 = "1e72752052a3893d0f7103fbac728b60b934f5a5"
+git-tree-sha1 = "e39bea10478c6aff5495ab522517fae5134b40e3"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.19.4"
+version = "1.20.0"
+
+[[PlutoUI]]
+deps = ["Base64", "Dates", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "Suppressor"]
+git-tree-sha1 = "44e225d5837e2a2345e69a1d1e01ac2443ff9fcb"
+uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+version = "0.7.9"
 
 [[Preferences]]
 deps = ["TOML"]
@@ -827,9 +775,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "885838778bb6f0136f8317757d7803e0d81201e4"
+git-tree-sha1 = "3fedeffc02e47d6e3eb479150c8e5cd8f15a77a0"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.2.9"
+version = "1.2.10"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
@@ -852,6 +800,11 @@ git-tree-sha1 = "000e168f5cc9aded17b6999a560b7c11dda69095"
 uuid = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
 version = "0.6.0"
 
+[[Suppressor]]
+git-tree-sha1 = "a819d77f31f83e5792a76081eee1ea6342ab8787"
+uuid = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
+version = "0.2.0"
+
 [[TOML]]
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
@@ -864,9 +817,9 @@ version = "1.0.1"
 
 [[Tables]]
 deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "LinearAlgebra", "TableTraits", "Test"]
-git-tree-sha1 = "8ed4a3ea724dac32670b062be3ef1c1de6773ae8"
+git-tree-sha1 = "d0c690d37c73aeb5ca063056283fde5585a41710"
 uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
-version = "1.4.4"
+version = "1.5.0"
 
 [[Tar]]
 deps = ["ArgTools", "SHA"]
@@ -1100,18 +1053,20 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─6b8adf4c-f0f8-11eb-384c-bfb58bdd7eac
-# ╟─6f5601b2-da4e-4fb8-b820-e912cd39be35
-# ╟─4ae1fd26-3840-4478-91d1-fc791c360b21
-# ╟─6a387f58-76e2-428c-a6e7-ba5b6446a32d
-# ╟─954bdf08-562c-4daf-a855-8f5d2004aa8b
-# ╠═cdb20e14-3483-443a-b279-da513c5523cb
-# ╟─245f2e27-d4a0-4a95-99c6-105b5bbfc3c1
-# ╟─25adb671-c2e3-4a05-bbce-d12f4f10088d
-# ╠═e384cf89-f714-486a-ba25-eecb67ca602b
-# ╟─1997d979-1450-44e4-a659-5db8eda10893
-# ╟─0737dfec-dc4b-4310-9e79-d867fb3032db
-# ╟─6607500c-fb94-401d-ad88-8abeaf6f9729
-# ╟─87523e56-407f-4616-b633-c8669959088f
+# ╟─ea515ece-f662-11eb-2dc7-7793e353bd97
+# ╟─6d9ecb41-5b09-4c42-9757-f809312be8ee
+# ╟─80f57ce8-64b5-415d-be3d-9e100501a4c7
+# ╟─09952b14-548c-435f-99b7-6e67b7c0dcbe
+# ╟─b343b35a-a4d5-45cd-b1dc-1dcbc7dbf1e2
+# ╠═9dda7ea2-6d8a-4b12-bff0-193c26a2d73c
+# ╟─7738f604-f86d-4721-8272-75fb89757d35
+# ╟─01498738-e8d6-4140-8458-c6a1b0918254
+# ╟─aff6ee03-bb2e-4747-91fa-4474b0227361
+# ╠═2ef19145-f392-4823-9a28-86afebd4cec3
+# ╠═dfc28244-e4a8-4f82-b88e-0bae5e2f778d
+# ╟─cdd3cfec-0060-4b32-978f-9ae137ea9f43
+# ╟─dc7d1023-8890-412c-b055-cb3dd71ef0c5
+# ╟─3f49cda1-bac3-4f66-b7b2-5f376e230e0b
+# ╟─62794a81-e1fa-4c0c-b0cd-c04007b1197a
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
