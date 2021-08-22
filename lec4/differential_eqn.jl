@@ -184,7 +184,7 @@ md"
 
 What can be the value of $e^{At}$?
 
-Just as we do in the case of real number, let's exand this using Taylor's series.
+Just as we do in the case of real numbers, let's exand this using Taylor's series.
 
 $$e^{At} = I + At + \frac{1}{2!}(At)^2 + \frac{1}{3!}(At)^3 + \cdots$$
 
