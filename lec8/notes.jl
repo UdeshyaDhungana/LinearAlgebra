@@ -54,6 +54,11 @@ In $\mathbf{R^2}$, all the vectors with $||v||_2 = 1$.
 It's a circle, obviously!
 "
 
+# ╔═╡ 8cfe2880-7e5d-46f4-8102-afd5ed234357
+md"
+---
+"
+
 # ╔═╡ 75bf7370-da3a-4d6d-bc1d-1fd7ad0a4241
 md"
 All the vectors with $l^1$ norm unity forms a diamond centered at origin because
@@ -74,6 +79,11 @@ begin
 	plot(x, y, aspect_ratio=1, legend=false, title="Vectors with unity l1 norm")
 end
 
+# ╔═╡ 2a1e8515-26bc-4820-9390-b175b7b23bcb
+md"
+---
+"
+
 # ╔═╡ 5fb885ef-bda2-4ece-9c87-72484eb99853
 begin
 	x3s = range(-1, 1, step=0.01)
@@ -86,16 +96,24 @@ end
 # ╔═╡ 2ff475ce-ccc6-4e34-a28d-4bb5d7c319a7
 md"
 __Note:__ These lines extend till infinity
+
+---
 "
 
 # ╔═╡ 87ef3224-a445-48ac-be2c-d545192d451d
 begin
-	tempx_infs = range(-1, 1, step=0.01)
-	tempy_infs = ones(length(tempx_infs))
-	infx = [tempx_infs tempy_infs tempx_infs -tempy_infs]
-	infy = [tempy_infs tempx_infs -tempy_infs tempx_infs]
-	plot(infx, infy, aspect_ratio=1, legend=false, title="Vectors with unity infinity norm")
+		tempx_infs = range(-1, 1, step=0.01)
+		tempy_infs = ones(length(tempx_infs))
+		infx = [tempx_infs tempy_infs tempx_infs -tempy_infs]
+		infy = [tempy_infs tempx_infs -tempy_infs tempx_infs]
+		plot(infx, infy, aspect_ratio=1, legend=false, title="Vectors with unity infinity norm")
 end
+
+# ╔═╡ e04fe24c-085d-456a-985b-2983d776411f
+md"Infinity norm picks out the largest among the absolute values of the components of a vector
+
+---
+"
 
 # ╔═╡ e8bb4af5-0c67-4bc2-a29a-0dcc12d39803
 begin
@@ -110,14 +128,30 @@ begin
 	plot(hvxs, hvys, aspect_ratio=1, legend=false, title="Vectors with unity half norm")
 end
 
+# ╔═╡ 3adab70b-9998-40c3-8f17-25836f2f2c28
+md"
+---
+"
+
 # ╔═╡ f138a227-9589-4ed6-8674-5f555119b4d5
 md"
 Notice an interesting fact. $l^0$ norm is a deflated balloon. $l^{\frac{1}{2}}$ is a little inflated. $l^1$ becomes a diamond. $l^2$ expands into a good circular balloon. $l^{\infty}$ expands to become a square. It's the maximum norm!
+
+A positive definite matrix gives the shape of a norm. $v^TSv = 1$ forms a circle ($l^2$ norm) when $S$ is an indentity matrix.
+
+---
 "
 
 # ╔═╡ 2dd29ed5-71fb-4096-8974-b438a976f738
 md"
-A positive definite matrix gives the shape of a norm. $v^TSv = 1$ forms a circle ($l^2$ norm) when $S$ is an indentity matrix.
+## Which is true norm?
+
+Every norm has to follow following inequalities
+
+1. Scaling $\left(||cv|| = |c|||v||\right)$
+2. Triangle inequality $\left(||v+w|| \leq ||v|| + ||ww||\right)$
+
+Norm $0$ does not satisfy first one, $\frac{1}{2}$ doesn't hold for second. So they aren't __true__ norms.
 
 ---
 "
@@ -135,6 +169,8 @@ In easier words, minimize $l^2$ subject to $c_1x_1 + c_2x_2 = b$
 + Inflate/Deflate the circle till the line is tangent to the circle. The tangent point is the required answer
 
 Minimize $x_1 + 2x_2 = 2$ subject to $l^2$ norm
+
+---
 "
 
 # ╔═╡ a519ef26-7153-4f67-8533-57bcb126d263
@@ -170,11 +206,32 @@ We can choose $U$ to be identity
 
 $$||A||_F = ||\Sigma||_F$$
 
+Frobenius norm is like flattening out a matrix into a vector and taking its $l^2$ norm.
+
 Also,
 
 $$||A||_{Nuclear} = \sigma_1 + \dots + \sigma_n$$
 
 __Optimization by gradient descent picks out weights that minimize nuclear norm__
+
+---
+"
+
+# ╔═╡ c49eb0c1-e62f-417f-87ba-b019ef9dd3d3
+md"
+## Pseudoinverse
+
+Just as $Av = \sigma{}u$, $A^+u = \frac{1}{\sigma}v$. The matrix $A^+$ is the pseudoinverse of $A$ and it transforms the column space to row space, and the vectors from left nullspace (null space of $A^T$) to zero. Any vector in $R^m$ is a combination of some vectors in column space and some in left null space. 
+
++ The matrix $AA^+$ is a projection matrix onto the column space of $A$.
+
++ The matrix $A^+A$ is a projection matrix onto the row space of $A$.+
+
+The matrix $\Sigma{}^+\Sigma{}$ is as near to identity as it can get.
+
+The matrix $A$ sends its row space to column space and null space to $0$. $A^+$ sends its column space to row space and null space of $A^T$ to $0$.
+
+When $m = n = r$, $A^+ = A^{-1}$.
 
 ---
 "
@@ -1401,12 +1458,16 @@ version = "0.9.1+5"
 # ╟─a4ccc365-a0e0-4ad5-96ec-89a093658032
 # ╟─a9c9d307-8407-47cf-ad3b-cc6111173dbb
 # ╟─467eb260-3fc2-466f-9679-f10c65f86fad
+# ╟─8cfe2880-7e5d-46f4-8102-afd5ed234357
 # ╟─75bf7370-da3a-4d6d-bc1d-1fd7ad0a4241
 # ╟─2662cd73-365a-42be-8e41-e00f1b4c04f4
+# ╟─2a1e8515-26bc-4820-9390-b175b7b23bcb
 # ╟─5fb885ef-bda2-4ece-9c87-72484eb99853
 # ╟─2ff475ce-ccc6-4e34-a28d-4bb5d7c319a7
 # ╟─87ef3224-a445-48ac-be2c-d545192d451d
+# ╟─e04fe24c-085d-456a-985b-2983d776411f
 # ╟─e8bb4af5-0c67-4bc2-a29a-0dcc12d39803
+# ╟─3adab70b-9998-40c3-8f17-25836f2f2c28
 # ╟─f138a227-9589-4ed6-8674-5f555119b4d5
 # ╟─2dd29ed5-71fb-4096-8974-b438a976f738
 # ╟─3e4e2b72-fe8d-4954-9a25-48fa9c5c398d
@@ -1414,5 +1475,6 @@ version = "0.9.1+5"
 # ╟─a519ef26-7153-4f67-8533-57bcb126d263
 # ╟─8fc96c4a-8cc5-444f-8013-45a4b57dc3cb
 # ╟─f2935ff7-58c0-4754-9c9d-d3ba2f89fdc9
+# ╟─c49eb0c1-e62f-417f-87ba-b019ef9dd3d3
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
