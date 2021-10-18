@@ -169,8 +169,6 @@ In easier words, minimize $l^2$ subject to $c_1x_1 + c_2x_2 = b$
 + Inflate/Deflate the circle till the line is tangent to the circle. The tangent point is the required answer
 
 Minimize $x_1 + 2x_2 = 2$ subject to $l^2$ norm
-
----
 "
 
 # ╔═╡ a519ef26-7153-4f67-8533-57bcb126d263
