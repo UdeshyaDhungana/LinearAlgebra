@@ -5,3 +5,4 @@ Make sure you have Pluto (Julia) and Jupyter Notebook installed on your environm
 
 Notes, and some solutions to some problems from and after lecture 9 are handwritten.
 
+Julia file is missing from lec11
